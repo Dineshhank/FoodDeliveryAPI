@@ -26,7 +26,7 @@ namespace FoodDelivery.Application.Features.Cart.Handlers
             if (cart == null)
                 return null;
 
-            return new CartDto
+            return new CartDto 
             {
                 CartId = cart.Id,
                 TotalPrice = cart.Cartitems.Sum(x => x.Price * x.Quantity),

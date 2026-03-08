@@ -20,7 +20,12 @@ namespace FoodDelivery.Application.Features.Cart.Handlers
 
         public async Task<bool> Handle(UpdateCartItemQuantityCommand request, CancellationToken cancellationToken)
         {
-            var item = await _cartRepository.GetCartItemByIdAsync(request.MenuItemId);
+            var cart = await _cartRepository.GetCartByUserIdAsync(request.UserId);
+
+            if (cart == null)
+                return false;
+
+            var item = await _cartRepository.GetCartItemAsync(cart.Id, request.MenuItemId);
 
             if (item == null)
                 return false;
@@ -28,6 +33,8 @@ namespace FoodDelivery.Application.Features.Cart.Handlers
             item.Quantity = request.Quantity;
 
             await _cartRepository.UpdateCartItemAsync(item);
+
+            await _cartRepository.SaveChangesAsync();
 
             return true;
         }
