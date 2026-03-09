@@ -1,10 +1,11 @@
+using FluentValidation;
 using FoodDelivery.API.Middlewares;
 using FoodDelivery.Application.Common.Behaviors;
 using FoodDelivery.Application.Interfaces;
 using FoodDelivery.Infrastructure.ExternalServices;
+using FoodDelivery.Infrastructure.ExternalServices.Payments;
 using FoodDelivery.Persistence.Context;
 using FoodDelivery.Persistence.Repositories;
-using FluentValidation;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -22,6 +23,9 @@ builder.Services.AddScoped<IRestaurantRepository, RestaurantRepository>();
 builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
 builder.Services.AddScoped<IMenuItemRepository, MenuItemRepository>();
 builder.Services.AddScoped<ICartRepository, CartRepository>();
+builder.Services.AddScoped<IOrderRepository, OrderRepository>();
+builder.Services.AddScoped<IPaymentGatewayService, RazorpayPaymentService>();
+builder.Services.AddScoped<IPaymentRepository, PaymentRepository>();
 // Add services to the container.
 builder.Services.AddDbContext<FoodDeliveryDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));

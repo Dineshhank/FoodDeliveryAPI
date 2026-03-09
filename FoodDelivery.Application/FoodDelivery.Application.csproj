@@ -12,11 +12,9 @@
 
   <ItemGroup>
     <Folder Include="DTOs\" />
-    <Folder Include="Features\Orders\Commands\" />
-    <Folder Include="Features\Orders\Handlers\" />
-    <Folder Include="Features\Orders\DTOs\" />
     <Folder Include="Features\Orders\Validators\" />
     <Folder Include="Features\Orders\Queries\" />
+    <Folder Include="Features\Payments\Queries\" />
     <Folder Include="Features\Users\" />
   </ItemGroup>
 

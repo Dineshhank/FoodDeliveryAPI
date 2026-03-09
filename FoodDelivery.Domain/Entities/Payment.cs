@@ -11,7 +11,7 @@ public partial class Payment
 
     public string Paymentprovider { get; set; } = null!;
 
-    public string Providerpaymentid { get; set; } = null!;
+    public string Providerpaymentid { get; set; }
 
     public string? Providerorderid { get; set; }
 
