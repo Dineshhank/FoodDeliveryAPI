@@ -1,0 +1,170 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>Razorpay Webhook Simulator</title>
+    <style>
+        body {
+            font-family: system-ui, sans-serif;
+            margin: 20px;
+            max-width: 800px;
+        }
+
+        label {
+            display: block;
+            margin-top: 10px;
+            font-weight: 600;
+        }
+
+        input, textarea {
+            width: 100%;
+            padding: 6px;
+            margin-top: 4px;
+        }
+
+        button {
+            margin-top: 16px;
+            padding: 8px 16px;
+            cursor: pointer;
+        }
+
+        pre {
+            background: #111827;
+            color: #e5e7eb;
+            padding: 10px;
+            overflow-x: auto;
+        }
+
+        .row {
+            display: flex;
+            gap: 10px;
+        }
+
+            .row > div {
+                flex: 1;
+            }
+    </style>
+</head>
+<body>
+    <h2>Razorpay Webhook Simulator</h2>
+
+    <p><strong>Config</strong></p>
+    <label>API Base URL (your backend)</label>
+    <input id="apiBaseUrl" value="https://localhost:5001/api/payments/razorpay-webhook" />
+
+    <label>Webhook Secret (same as in Razorpay dashboard)</label>
+    <input id="webhookSecret" type="password" placeholder="enter temporarily for testing" />
+
+    <hr />
+
+    <div class="row">
+        <div>
+            <p><strong>Payment Details (simulate Razorpay)</strong></p>
+            <label>Razorpay Order Id</label>
+            <input id="orderId" value="order_SPY8lNyBYnYjfF" />
+
+            <label>Razorpay Payment Id</label>
+            <input id="paymentId" value="pay_test_123456789" />
+        </div>
+        <div>
+            <p><strong>Generated Webhook Body</strong></p>
+            <textarea id="body" rows="10"></textarea>
+        </div>
+    </div>
+
+    <button id="buildBodyBtn">1. Build Body</button>
+    <button id="sendWebhookBtn">2. Send Webhook</button>
+
+    <h3>Request / Response</h3>
+    <pre id="log"></pre>
+
+    <script>// Simple HMAC-SHA256 using Web Crypto API
+    async function hmacSHA256(secret, data) {
+      const enc = new TextEncoder();
+      const key = await crypto.subtle.importKey(
+        "raw",
+        enc.encode(secret),
+        { name: "HMAC", hash: "SHA-256" },
+        false,
+        ["sign"]
+      );
+      const sigBuffer = await crypto.subtle.sign("HMAC", key, enc.encode(data));
+      // Convert ArrayBuffer to hex string
+      const bytes = new Uint8Array(sigBuffer);
+      return Array.from(bytes).map(b => b.toString(16).padStart(2, "0")).join("");
+    }
+
+    const orderIdInput = document.getElementById("orderId");
+    const paymentIdInput = document.getElementById("paymentId");
+    const bodyTextArea = document.getElementById("body");
+    const apiBaseUrlInput = document.getElementById("apiBaseUrl");
+    const webhookSecretInput = document.getElementById("webhookSecret");
+    const logPre = document.getElementById("log");
+
+    document.getElementById("buildBodyBtn").addEventListener("click", () => {
+      const orderId = orderIdInput.value.trim();
+      const paymentId = paymentIdInput.value.trim();
+
+      const payload = {
+        event: "payment.captured",
+        payload: {
+          payment: {
+            entity: {
+              id: paymentId,
+              order_id: orderId
+            }
+          }
+        }
+      };
+
+      bodyTextArea.value = JSON.stringify(payload);
+    });
+
+    document.getElementById("sendWebhookBtn").addEventListener("click", async () => {
+      try {
+        const url = apiBaseUrlInput.value.trim();
+        const secret = webhookSecretInput.value.trim();
+        const body = bodyTextArea.value.trim();
+
+        if (!url) {
+          alert("API base URL is required.");
+          return;
+        }
+        if (!body) {
+          alert("Build body first.");
+          return;
+        }
+        if (!secret) {
+          alert("Webhook secret is required to generate a valid signature.");
+          return;
+        }
+
+        const signature = await hmacSHA256(secret, body);
+
+        logPre.textContent =
+          "POST " + url + "\n" +
+          "X-Razorpay-Signature: " + signature + "\n\n" +
+          body + "\n\nSending...\n";
+
+        const res = await fetch(url, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "X-Razorpay-Signature": signature
+          },
+          body
+        });
+
+        const text = await res.text();
+        logPre.textContent +=
+          "Status: " + res.status + "\n\n" +
+          "Response:\n" + text;
+      } catch (err) {
+        logPre.textContent += "\nError:\n" + err;
+      }
+    });
+
+    // Initialize body on load for convenience
+    document.getElementById("buildBodyBtn").click();</script>
+</body>
+</html>
