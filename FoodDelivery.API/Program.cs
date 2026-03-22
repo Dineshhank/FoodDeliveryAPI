@@ -29,7 +29,8 @@ builder.Services.AddScoped<IPaymentRepository, PaymentRepository>();
 // Add services to the container.
 builder.Services.AddDbContext<FoodDeliveryDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
-Console.WriteLine(builder.Configuration.GetConnectionString("DefaultConnection"));
+var conn = builder.Configuration.GetConnectionString("DefaultConnection");
+Console.WriteLine("DB: " + conn);
 builder.Services.AddControllers();
 builder.Services.AddScoped<IJwtTokenService, JwtTokenService>();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
