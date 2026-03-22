@@ -28,7 +28,13 @@ builder.Services.AddScoped<IPaymentGatewayService, RazorpayPaymentService>();
 builder.Services.AddScoped<IPaymentRepository, PaymentRepository>();
 // Add services to the container.
 builder.Services.AddDbContext<FoodDeliveryDbContext>(options =>
-    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+    options.UseNpgsql(
+        builder.Configuration.GetConnectionString("DefaultConnection"),
+        o =>
+        {
+            o.CommandTimeout(120);
+            o.EnableRetryOnFailure(5);
+        }));
 var conn = builder.Configuration.GetConnectionString("DefaultConnection");
 Console.WriteLine("DB: " + conn);
 builder.Services.AddControllers();
