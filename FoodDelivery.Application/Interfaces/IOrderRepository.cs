@@ -15,7 +15,9 @@ namespace FoodDelivery.Application.Interfaces
 
         Task<Order?> GetOrderByIdAsync(Guid orderId);
 
-
+        Task<List<Order>> GetOrdersByUserIdAsync(Guid userId);
+        Task UpdateOrderAsync(Order order);
+        Task AddOrderStatusHistoryAsync(Orderstatushistory history);
         Task SaveChangesAsync();
     }
 }

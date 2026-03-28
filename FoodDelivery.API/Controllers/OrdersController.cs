@@ -1,6 +1,7 @@
 ﻿using FoodDelivery.Application.Common.Models;
 using FoodDelivery.Application.Features.Orders.Commands;
 using FoodDelivery.Application.Features.Orders.DTOs;
+using FoodDelivery.Application.Features.Orders.Queries;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -41,6 +42,45 @@ namespace FoodDelivery.API.Controllers
                 "Order created successfully",
                 orderId
             ));
+        }
+
+        // ✅ Get My Orders
+        [HttpGet("GetMyOrders")]
+        public async Task<IActionResult> GetMyOrders()
+        {
+            var userId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
+
+            var result = await _mediator.Send(new GetMyOrdersQuery
+            {
+                UserId = userId
+            });
+
+            return Ok(new ApiResponse<List<OrderDto>>(200, "Orders fetched", result));
+        }
+
+        // ✅ Get Order By Id
+        [HttpGet("GetOrderById")]
+        public async Task<IActionResult> GetOrderById(Guid orderId)
+        {
+            var result = await _mediator.Send(new GetOrderByIdQuery
+            {
+                OrderId = orderId
+            });
+
+            return Ok(new ApiResponse<OrderDto>(200, "Order fetched", result));
+        }
+
+        // ✅ Update Status
+        [HttpPut("UpdateStatus")]
+        public async Task<IActionResult> UpdateStatus([FromBody] UpdateOrderStatusRequest request)
+        {
+            var result = await _mediator.Send(new UpdateOrderStatusCommand
+            {
+                OrderId = request.OrderId,
+                Status = request.Status
+            });
+
+            return Ok(new ApiResponse<bool>(200, "Order status updated", result));
         }
     }
 }

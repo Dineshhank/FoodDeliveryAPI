@@ -36,6 +36,26 @@ namespace FoodDelivery.Persistence.Repositories
                 .FirstOrDefaultAsync(x => x.Id == orderId);
         }
 
+        public async Task<List<Order>> GetOrdersByUserIdAsync(Guid userId)
+        {
+            return await _context.Orders
+                .Where(x => x.Userid == userId)
+                .Include(x => x.Orderitems)
+                .ToListAsync();
+        }
+
+
+        public Task UpdateOrderAsync(Order order)
+        {
+            _context.Orders.Update(order);
+            return Task.CompletedTask;
+        }
+
+        public async Task AddOrderStatusHistoryAsync(Orderstatushistory history)
+        {
+            await _context.Orderstatushistories.AddAsync(history);
+        }
+
         public async Task SaveChangesAsync()
         {
             await _context.SaveChangesAsync();
