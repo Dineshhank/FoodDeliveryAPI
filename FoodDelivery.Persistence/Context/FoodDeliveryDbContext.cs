@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using FoodDelivery.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
@@ -393,6 +393,12 @@ public partial class FoodDeliveryDbContext : DbContext
                 .HasMaxLength(50)
                 .HasColumnName("paymentstatus");
             entity.Property(e => e.Restaurantid).HasColumnName("restaurantid");
+            entity.Property(e => e.Restaurantlatitude)
+                .HasPrecision(10, 8)
+                .HasColumnName("restaurantlatitude");
+            entity.Property(e => e.Restaurantlongitude)
+                .HasPrecision(11, 8)
+                .HasColumnName("restaurantlongitude");
             entity.Property(e => e.Serviceareaid).HasColumnName("serviceareaid");
             entity.Property(e => e.Status)
                 .HasMaxLength(50)

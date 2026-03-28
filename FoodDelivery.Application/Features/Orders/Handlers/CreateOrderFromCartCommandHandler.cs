@@ -1,4 +1,4 @@
-﻿using FoodDelivery.Application.Features.Orders.Commands;
+using FoodDelivery.Application.Features.Orders.Commands;
 using FoodDelivery.Application.Interfaces;
 using FoodDelivery.Domain.Entities;
 using MediatR;
@@ -14,13 +14,16 @@ namespace FoodDelivery.Application.Features.Orders.Handlers
     {
         private readonly ICartRepository _cartRepository;
         private readonly IOrderRepository _orderRepository;
+        private readonly IRestaurantRepository _restaurantRepository;
 
         public CreateOrderFromCartCommandHandler(
             ICartRepository cartRepository,
-            IOrderRepository orderRepository)
+            IOrderRepository orderRepository,
+            IRestaurantRepository restaurantRepository)
         {
             _cartRepository = cartRepository;
             _orderRepository = orderRepository;
+            _restaurantRepository = restaurantRepository;
         }
 
         public async Task<Guid> Handle(CreateOrderFromCartCommand request, CancellationToken cancellationToken)
@@ -38,6 +41,10 @@ namespace FoodDelivery.Application.Features.Orders.Handlers
 
             var finalAmount = subTotal + deliveryFee + tax - discount;
 
+            var restaurant = await _restaurantRepository.GetByIdAsync(cart.Restaurantid);
+            if (restaurant == null)
+                throw new Exception("Restaurant not found");
+
             var order = new Order
             {
                 Id = Guid.NewGuid(),
@@ -45,7 +52,9 @@ namespace FoodDelivery.Application.Features.Orders.Handlers
 
                 Userid = request.UserId,
                 Restaurantid = cart.Restaurantid,
-                Serviceareaid = Guid.Parse("460c6de4-dba8-487e-8bc8-a3db6c907ff3"), // replace with actual
+                Serviceareaid = restaurant.Serviceareaid,
+                Restaurantlatitude = restaurant.Latitude,
+                Restaurantlongitude = restaurant.Longitude,
 
                 Subtotal = subTotal,
                 Deliveryfee = deliveryFee,

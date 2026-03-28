@@ -1,4 +1,4 @@
-﻿using FoodDelivery.Application.Interfaces;
+using FoodDelivery.Application.Interfaces;
 using FoodDelivery.Domain.Entities;
 using FoodDelivery.Persistence.Context;
 using Microsoft.EntityFrameworkCore;
@@ -44,6 +44,34 @@ namespace FoodDelivery.Persistence.Repositories
                 .ToListAsync();
         }
 
+        public async Task<List<Order>> GetOrdersByDeliveryPartnerIdAsync(
+            Guid deliveryPartnerUserId,
+            CancellationToken cancellationToken = default)
+        {
+            return await _context.Orders
+                .Where(x =>
+                    x.Deliverypartnerid == deliveryPartnerUserId &&
+                    (x.Isdeleted == null || x.Isdeleted == false))
+                .Include(x => x.Orderitems)
+                .OrderByDescending(x => x.Createdat)
+                .ToListAsync(cancellationToken);
+        }
+
+        public async Task<List<Order>> GetAvailableOrdersForDeliveryAsync(
+            Guid serviceAreaId,
+            CancellationToken cancellationToken = default)
+        {
+            return await _context.Orders
+                .Where(o =>
+                    o.Serviceareaid == serviceAreaId &&
+                    o.Deliverypartnerid == null &&
+                    o.Status == "CONFIRMED" &&
+                    (o.Isdeleted == null || o.Isdeleted == false))
+                .Include(o => o.Orderitems)
+                .Include(o => o.Restaurant)
+                .OrderBy(o => o.Createdat)
+                .ToListAsync(cancellationToken);
+        }
 
         public Task UpdateOrderAsync(Order order)
         {

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 
 namespace FoodDelivery.Domain.Entities;
@@ -12,6 +12,11 @@ public partial class Order
     public Guid Userid { get; set; }
 
     public Guid Restaurantid { get; set; }
+
+    /// <summary>Restaurant location snapshot at order time (geofence / maps).</summary>
+    public decimal? Restaurantlatitude { get; set; }
+
+    public decimal? Restaurantlongitude { get; set; }
 
     public Guid? Deliverypartnerid { get; set; }
 
