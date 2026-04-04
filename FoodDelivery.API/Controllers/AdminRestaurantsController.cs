@@ -75,5 +75,6 @@ namespace FoodDelivery.API.Controllers
                 "Restaurant updated",
                 null));
         }
+
     }
 }
