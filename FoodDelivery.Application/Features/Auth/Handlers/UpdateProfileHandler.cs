@@ -1,4 +1,4 @@
-﻿using FoodDelivery.Application.Features.Auth.Commands;
+using FoodDelivery.Application.Features.Auth.Commands;
 using FoodDelivery.Application.Interfaces;
 using MediatR;
 using System;
@@ -35,7 +35,7 @@ namespace FoodDelivery.Application.Features.Auth.Handlers
                 user.Dateofbirth = request.Dateofbirth;
 
             user.Isprofilecompleted = true;
-            user.Updatedat = DateTime.UtcNow;
+            user.Updatedat = DateTime.SpecifyKind(DateTime.UtcNow, DateTimeKind.Unspecified);
 
             await _userRepository.UpdateUserAsync(user);
             await _userRepository.SaveChangesAsync();
