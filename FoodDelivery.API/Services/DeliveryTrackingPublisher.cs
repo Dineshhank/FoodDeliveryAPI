@@ -20,7 +20,7 @@ namespace FoodDelivery.API.Services
             CancellationToken cancellationToken = default)
         {
             return _hubContext.Clients
-                .Group(orderId.ToString())
+                .Group(OrderTrackingGroupName.From(orderId))
                 .SendAsync(
                     "LocationUpdated",
                     new { lat = latitude, lng = longitude },

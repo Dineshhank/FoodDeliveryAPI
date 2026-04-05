@@ -8,12 +8,20 @@ namespace FoodDelivery.API.Hubs
     {
         public async Task JoinOrderTrackingGroup(string orderId)
         {
-            await Groups.AddToGroupAsync(Context.ConnectionId, orderId);
+            var group = OrderTrackingGroupName.Normalize(orderId);
+            if (string.IsNullOrEmpty(group))
+                return;
+
+            await Groups.AddToGroupAsync(Context.ConnectionId, group);
         }
 
         public async Task LeaveOrderTrackingGroup(string orderId)
         {
-            await Groups.RemoveFromGroupAsync(Context.ConnectionId, orderId);
+            var group = OrderTrackingGroupName.Normalize(orderId);
+            if (string.IsNullOrEmpty(group))
+                return;
+
+            await Groups.RemoveFromGroupAsync(Context.ConnectionId, group);
         }
     }
 }
