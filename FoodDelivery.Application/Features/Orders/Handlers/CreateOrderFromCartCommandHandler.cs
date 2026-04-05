@@ -28,6 +28,13 @@ namespace FoodDelivery.Application.Features.Orders.Handlers
 
         public async Task<Guid> Handle(CreateOrderFromCartCommand request, CancellationToken cancellationToken)
         {
+            var activeOrder = await _orderRepository.GetActiveIncompleteOrderForUserAsync(
+                request.UserId,
+                cancellationToken);
+            if (activeOrder != null)
+                throw new Exception(
+                    "You already have an order in progress. Complete or cancel it before placing a new order.");
+
             var cart = await _cartRepository.GetCartByUserIdAsync(request.UserId);
 
             if (cart == null || !cart.Cartitems.Any())

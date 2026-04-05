@@ -16,6 +16,11 @@ namespace FoodDelivery.Application.Interfaces
         Task<Order?> GetOrderByIdAsync(Guid orderId);
 
         Task<List<Order>> GetOrdersByUserIdAsync(Guid userId);
+
+        /// <summary>
+        /// Latest order for the customer that is not delivered, not cancelled, and not soft-deleted.
+        /// </summary>
+        Task<Order?> GetActiveIncompleteOrderForUserAsync(Guid userId, CancellationToken cancellationToken = default);
         /// <param name="deliveryPartnerUserId">users.id of the rider (orders.deliverypartnerid).</param>
         Task<List<Order>> GetOrdersByDeliveryPartnerIdAsync(Guid deliveryPartnerUserId, CancellationToken cancellationToken = default);
 

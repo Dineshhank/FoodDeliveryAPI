@@ -44,6 +44,28 @@ namespace FoodDelivery.Persistence.Repositories
                 .ToListAsync();
         }
 
+        public async Task<Order?> GetActiveIncompleteOrderForUserAsync(
+            Guid userId,
+            CancellationToken cancellationToken = default)
+        {
+            return await _context.Orders
+                .AsNoTracking()
+                .Where(o =>
+                    o.Userid == userId &&
+                    (o.Isdeleted == null || o.Isdeleted == false) &&
+                    o.Cancelledat == null &&
+                    o.Status != null &&
+                    o.Status.ToLower() != "delivered" &&
+                    o.Status.ToLower() != "cancelled")
+                .Include(o => o.Orderitems)
+                    .ThenInclude(i => i.Menuitem)
+                .Include(o => o.Restaurant)
+                .Include(o => o.Deliverypartner)
+                .Include(o => o.Payments)
+                .OrderByDescending(o => o.Createdat)
+                .FirstOrDefaultAsync(cancellationToken);
+        }
+
         public async Task<List<Order>> GetOrdersByDeliveryPartnerIdAsync(
             Guid deliveryPartnerUserId,
             CancellationToken cancellationToken = default)

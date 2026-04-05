@@ -1,4 +1,4 @@
-﻿using FoodDelivery.Application.Common.Models;
+using FoodDelivery.Application.Common.Models;
 using FoodDelivery.Application.Features.Orders.Commands;
 using FoodDelivery.Application.Features.Orders.DTOs;
 using FoodDelivery.Application.Features.Orders.Queries;
@@ -42,6 +42,24 @@ namespace FoodDelivery.API.Controllers
                 "Order created successfully",
                 orderId
             ));
+        }
+
+        /// <summary>
+        /// Single call for the customer “current order” screen: full summary, payments, status, and rider if assigned.
+        /// Returns null data when there is no in-progress order (app can then show home).
+        /// </summary>
+        [HttpGet("GetMyActiveOrder")]
+        public async Task<IActionResult> GetMyActiveOrder()
+        {
+            var userId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
+
+            var result = await _mediator.Send(new GetMyActiveOrderQuery { UserId = userId });
+
+            var message = result == null
+                ? "No active order"
+                : "Active order loaded";
+
+            return Ok(new ApiResponse<CustomerActiveOrderDetailDto?>(200, message, result));
         }
 
         // ✅ Get My Orders

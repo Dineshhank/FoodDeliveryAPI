@@ -22,6 +22,7 @@ namespace FoodDelivery.Persistence.Repositories
         public async Task<Deliverypartner?> GetByUserIdAsync(Guid userId, CancellationToken cancellationToken = default)
         {
             return await _context.Deliverypartners
+                .Include(x => x.User)
                 .FirstOrDefaultAsync(x => x.Userid == userId, cancellationToken);
         }
 
